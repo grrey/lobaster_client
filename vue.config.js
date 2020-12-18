@@ -35,7 +35,8 @@ module.exports = {
     overlay: {
       warnings: false,
       errors: true
-    },
+	},
+	// host:'10.2.213.33',
     before: require('./mock/mock-server.js')
   },
   configureWebpack: {

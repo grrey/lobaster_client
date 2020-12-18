@@ -4,9 +4,10 @@
   "description": "A magical vue admin. An out-of-box UI solution for enterprise applications. Newest development stack of vue. Lots of awesome features",
   "author": "Pan <panfree23@gmail.com>",
   "scripts": {
-    "dev": "vue-cli-service serve",
-    "lint": "eslint --ext .js,.vue src",
+	"dev": "vue-cli-service serve",
     "build:prod": "vue-cli-service build",
+	
+    "lint": "eslint --ext .js,.vue src",
     "build:stage": "vue-cli-service build --mode staging",
     "preview": "node build/index.js --preview",
     "new": "plop",

@@ -1,6 +1,6 @@
 
 const tokens = {
-  admin3001: {
+  admin: {
     token: 'admin-token'
   },
   editor: {
