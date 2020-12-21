@@ -1,5 +1,8 @@
 <template>
 	<div class="app-container">
+
+
+ <a href="http://main.iqiyi.com/v_19rxvyirpw.html#curid=16338652600_6f3713efba76620cd3675116b2a42b8f" target="_blank">bofang </a>
 		<div class="filter-container">
 			<el-input
 				v-model="listQuery.title"
@@ -113,8 +116,6 @@
 			<el-table-column label="Title" width="150px">
 				<template slot-scope="{ row }">
 					<el-tag>{{ 1111 }}</el-tag>
-					<el-tag>{{ 222222 }}</el-tag>
-					<el-tag>{{ 3333 }}</el-tag>
 				</template>
 			</el-table-column>
 
@@ -172,13 +173,20 @@
         </template>
       </el-table-column> -->
 
+	   <el-table-column label="Readings" align="center" width="95">
+        <template slot-scope="{row}">
+          <span class="link-type" @click="handleUpdate(row)">Edit</span>
+        </template>
+      </el-table-column>  
+
+<!--
 			<el-table-column
 				label="Actions"
 				align="center"
-				width="230"
+				width="100"
 				class-name="small-padding fixed-width"
 			>
-				<template slot-scope="{ row, $index }">
+				<template slot-scope="{ row, }">
 					<el-button
 						type="primary"
 						size="mini"
@@ -186,7 +194,8 @@
 					>
 						Edit
 					</el-button>
-					<el-button
+
+					 <el-button
 						v-if="row.status != 'published'"
 						size="mini"
 						type="success"
@@ -208,9 +217,10 @@
 						@click="handleDelete(row, $index)"
 					>
 						Delete
-					</el-button>
+					</el-button> 
 				</template>
 			</el-table-column>
+			-->
 		</el-table>
 
 		<pagination
@@ -229,13 +239,19 @@
 				ref="dataForm"
 				:model="temp"
 				label-position="left"
-				label-width="80px"
-				style="width: 400px; margin-left: 50px"
+				label-width="150px"
+				style="width: 600px; margin-left: 50px"
 			>
-				<el-form-item label="Watch" prop="watch">
-					<el-input v-model="temp._source.watch_height" type="number" />
-					<el-input v-model="temp._source.watch_low" type="number" />
+				<el-form-item label="Watch_current" prop="watch_current">
+					<el-input v-model="temp._source.watchVal.curr_high" type="number" placeholder="max" />
+					<el-input v-model="temp._source.watchVal.curr_low" type="number"  placeholder="min"/>
 				</el-form-item>
+
+				<el-form-item label="Watch_his" prop="watch_his">
+					<el-input v-model="temp._source.watchVal.his_high" type="number" placeholder="max" />
+					<el-input v-model="temp._source.watchVal.his_low" type="number"  placeholder="min"/>
+				</el-form-item>
+				
 
 				<el-form-item label="Tag" prop="tag">
 					<el-select
@@ -285,9 +301,7 @@
 				</el-button>
 				<el-button
 					type="primary"
-					@click="
-						dialogStatus === 'create' ? createData() : updateData()
-					"
+					@click="dialogStatus === 'create' ? createData() : updateData() "
 				>
 					Confirm
 				</el-button>
@@ -307,9 +321,7 @@
 				<el-table-column prop="pv" label="Pv" />
 			</el-table>
 			<span slot="footer" class="dialog-footer">
-				<el-button type="primary" @click="dialogPvVisible = false"
-					>Confirm</el-button
-				>
+				<el-button type="primary" @click="dialogPvVisible = false" >Confirm</el-button>
 			</span>
 		</el-dialog>
 	</div>
@@ -383,8 +395,7 @@ export default {
 			temp: {
 				_id: undefined,
 				_source:{
-					watch_height: 110 ,
-					watch_low:10,
+					watchVal:{},
 					tag:[]
 				}
 			},
@@ -468,14 +479,14 @@ export default {
 				type: "",
 			};
 		},
-		handleCreate() {
-			this.resetTemp();
-			this.dialogStatus = "create";
-			this.dialogFormVisible = true;
-			this.$nextTick(() => {
-				this.$refs["dataForm"].clearValidate();
-			});
-		},
+		// handleCreate() {
+		// 	this.resetTemp();
+		// 	this.dialogStatus = "create";
+		// 	this.dialogFormVisible = true;
+		// 	this.$nextTick(() => {
+		// 		this.$refs["dataForm"].clearValidate();
+		// 	});
+		// },
 		createData() {
 			this.$refs["dataForm"].validate((valid) => {
 				if (valid) {
@@ -499,11 +510,11 @@ export default {
 			this.temp =  {
 				_id: row._id,
 				_source:{
-					watch_height: _source.watch_height ,
-					watch_low: _source.watch_low , 
+					watchVal: _source.watchVal || {}, 
 					tag: _source.tag ,
 				}
-			} 
+			};
+
 			this.dialogStatus = "update";
 			this.dialogFormVisible = true;
 			this.$nextTick(() => {
@@ -530,15 +541,7 @@ export default {
 				}
 			});
 		},
-		handleDelete(row, index) {
-			this.$notify({
-				title: "Success",
-				message: "Delete Successfully",
-				type: "success",
-				duration: 2000,
-			});
-			this.list.splice(index, 1);
-		},
+		 
 		handleFetchPv(pv) {
 			fetchPv(pv).then((response) => {
 				this.pvData = response.data.pvData;
@@ -588,4 +591,8 @@ export default {
 		},
 	},
 };
+
+
+
+
 </script>
