@@ -60,7 +60,7 @@ export default {
 	},
 	methods: {
 		async initChart() {
-			let data = await  this.$es.his.search({ 
+			let data = await  $es.his.search({ 
 				luceneStr:`marketCode:${ this.marketCode}`,
 				sort:`date:-`
 			}) 

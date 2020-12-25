@@ -1,8 +1,5 @@
 <template>
 	<div class="app-container">
-
-
- <a href="http://main.iqiyi.com/v_19rxvyirpw.html#curid=16338652600_6f3713efba76620cd3675116b2a42b8f" target="_blank">bofang </a>
 		<div class="filter-container">
 			<el-input
 				v-model="listQuery.title"
@@ -88,6 +85,38 @@
 			style="width: 100%"
 			@sort-change="sortChange"
 		>
+			<el-table-column type="expand">
+				<template slot-scope="{ row }">
+					<el-form
+						label-position="left"
+						inline
+						class="demo-table-expand"
+					>
+						<el-form-item label="商品名称">
+							<span>{{ row.name }}</span>
+						</el-form-item>
+						<el-form-item label="所属店铺">
+							<span>{{ row.shop }}</span>
+						</el-form-item>
+						<el-form-item label="商品 ID">
+							<span>{{ row.id }}</span>
+						</el-form-item>
+						<el-form-item label="店铺 ID">
+							<span>{{ row.shopId }}</span>
+						</el-form-item>
+						<el-form-item label="商品分类">
+							<span>{{ row.category }}</span>
+						</el-form-item>
+						<el-form-item label="店铺地址">
+							<span>{{ row.address }}</span>
+						</el-form-item>
+						<el-form-item label="商品描述">
+							<span>{{ row.desc }}</span>
+						</el-form-item>
+					</el-form>
+				</template>
+			</el-table-column>
+
 			<el-table-column
 				label="ID"
 				prop="id"
@@ -97,7 +126,7 @@
 				:class-name="getSortClass('id')"
 			>
 				<template slot-scope="{ row }">
-					<span>{{ row._id }}</span>
+					<span>{{ row._id_ }}</span>
 				</template>
 			</el-table-column>
 
@@ -113,9 +142,22 @@
 				</template>
 			</el-table-column>
 
-			<el-table-column label="Title" width="150px">
+			<el-table-column label="Tag" width="150px">
 				<template slot-scope="{ row }">
-					<el-tag>{{ 1111 }}</el-tag>
+					<el-tag v-for="(tag, i) in row._source.tag" :key="i">{{
+						tag
+					}}</el-tag>
+				</template>
+			</el-table-column>
+
+			<el-table-column label="Bussness" width="180">
+				<template slot-scope="{ row }">
+					<el-popover trigger="hover" placement="top" width="300">
+						<p>{{ row._source.JYFW }}</p>
+						<div slot="reference" class="name-wrapper">
+							<el-tag size="mini">{{ "bussness" }}</el-tag>
+						</div>
+					</el-popover>
 				</template>
 			</el-table-column>
 
@@ -173,13 +215,15 @@
         </template>
       </el-table-column> -->
 
-	   <el-table-column label="Readings" align="center" width="95">
-        <template slot-scope="{row}">
-          <span class="link-type" @click="handleUpdate(row)">Edit</span>
-        </template>
-      </el-table-column>  
+			<el-table-column label="Readings" align="center" width="95">
+				<template slot-scope="{ row }">
+					<span class="link-type" @click="handleUpdate(row)"
+						>Edit</span
+					>
+				</template>
+			</el-table-column>
 
-<!--
+			<!--
 			<el-table-column
 				label="Actions"
 				align="center"
@@ -240,18 +284,39 @@
 				:model="temp"
 				label-position="left"
 				label-width="150px"
-				style="width: 600px; margin-left: 50px"
+				style="padding: 0 50px"
 			>
 				<el-form-item label="Watch_current" prop="watch_current">
-					<el-input v-model="temp._source.watchVal.curr_high" type="number" placeholder="max" />
-					<el-input v-model="temp._source.watchVal.curr_low" type="number"  placeholder="min"/>
+					<el-input
+						v-model="temp._source.watchVal.curr_high"
+						type="number"
+						placeholder="max"
+					/>
+					<el-input
+						v-model="temp._source.watchVal.curr_low"
+						type="number"
+						placeholder="min"
+					/>
+					<el-checkbox v-model="temp._source.watchVal.curr"
+						>Enable</el-checkbox
+					>
 				</el-form-item>
 
 				<el-form-item label="Watch_his" prop="watch_his">
-					<el-input v-model="temp._source.watchVal.his_high" type="number" placeholder="max" />
-					<el-input v-model="temp._source.watchVal.his_low" type="number"  placeholder="min"/>
+					<el-input
+						v-model="temp._source.watchVal.his_high"
+						type="number"
+						placeholder="max"
+					/>
+					<el-input
+						v-model="temp._source.watchVal.his_low"
+						type="number"
+						placeholder="min"
+					/>
+					<el-checkbox v-model="temp._source.watchVal.his"
+						>Enable</el-checkbox
+					>
 				</el-form-item>
-				
 
 				<el-form-item label="Tag" prop="tag">
 					<el-select
@@ -295,17 +360,21 @@
         </el-form-item> 
 		-->
 			</el-form>
+
 			<div slot="footer" class="dialog-footer">
 				<el-button @click="dialogFormVisible = false">
 					Cancel
 				</el-button>
 				<el-button
 					type="primary"
-					@click="dialogStatus === 'create' ? createData() : updateData() "
+					@click="
+						dialogStatus === 'create' ? createData() : updateData()
+					"
 				>
 					Confirm
 				</el-button>
 			</div>
+			
 		</el-dialog>
 
 		<!-- ========================================================================= -->
@@ -321,7 +390,9 @@
 				<el-table-column prop="pv" label="Pv" />
 			</el-table>
 			<span slot="footer" class="dialog-footer">
-				<el-button type="primary" @click="dialogPvVisible = false" >Confirm</el-button>
+				<el-button type="primary" @click="dialogPvVisible = false"
+					>Confirm</el-button
+				>
 			</span>
 		</el-dialog>
 	</div>
@@ -394,10 +465,10 @@ export default {
 			showReviewer: false,
 			temp: {
 				_id: undefined,
-				_source:{
-					watchVal:{},
-					tag:[]
-				}
+				_source: {
+					watchVal: {},
+					tag: [],
+				},
 			},
 			dialogFormVisible: false,
 			dialogStatus: "",
@@ -434,7 +505,7 @@ export default {
 			//     }, 1.5 * 1000)
 			//   })
 
-			let response = await this.$es.stock.search({
+			let response = await $es.stock.search({
 				luceneStr: `name:中`,
 				page: 1,
 			});
@@ -506,13 +577,13 @@ export default {
 			});
 		},
 		handleUpdate(row) {
-			let _source = row._source ;
-			this.temp =  {
+			let _source = row._source;
+			this.temp = {
 				_id: row._id,
-				_source:{
-					watchVal: _source.watchVal || {}, 
-					tag: _source.tag ,
-				}
+				_source: {
+					watchVal: _source.watchVal || {},
+					tag: _source.tag,
+				},
 			};
 
 			this.dialogStatus = "update";
@@ -522,11 +593,11 @@ export default {
 			});
 		},
 		updateData() {
-			this.$refs["dataForm"].validate( async (valid) => {
+			this.$refs["dataForm"].validate(async (valid) => {
 				if (valid) {
-					const tempData =  this.temp ;
-					await this.$es.stock.update( tempData._id ,tempData._source );
- 
+					const tempData = this.temp;
+					await $es.stock.update(tempData._id, tempData._source);
+
 					const index = this.list.findIndex(
 						(v) => v._id === this.temp._id
 					);
@@ -537,11 +608,11 @@ export default {
 						message: "Update Successfully",
 						type: "success",
 						duration: 2000,
-					}); 
+					});
 				}
 			});
 		},
-		 
+
 		handleFetchPv(pv) {
 			fetchPv(pv).then((response) => {
 				this.pvData = response.data.pvData;
@@ -591,8 +662,19 @@ export default {
 		},
 	},
 };
-
-
-
-
 </script>
+
+<style>
+.demo-table-expand {
+	font-size: 0;
+}
+.demo-table-expand label {
+	width: 90px;
+	color: #99a9bf;
+}
+.demo-table-expand .el-form-item {
+	margin-right: 0;
+	margin-bottom: 0;
+	width: 50%;
+}
+</style>

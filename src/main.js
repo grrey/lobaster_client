@@ -14,7 +14,7 @@ import App from './App'
 import store from './store'
 import router from './router'
 
-import $es from '@/plugin/elastic' // elasticSearch
+import $es from '@/plugin/elastic/index' // elasticSearch
 
 import './icons' // icon
 import './permission' // permission control
@@ -35,7 +35,14 @@ if (process.env.NODE_ENV === 'production') {
   mockXHR()
 }
 
-Vue.use($es)
+window.sleep = function (t) {
+	return new Promise((r)=>{
+		setTimeout( r , t);
+	})
+} 
+
+window.$es = $es ;
+
 
 Vue.use(Element, {
   size: 'small', // Cookies.get('size') ||     mini small ,medium

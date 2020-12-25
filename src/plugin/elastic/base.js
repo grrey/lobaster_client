@@ -7,12 +7,15 @@ const client = new Client({
     node: esHost
 })
 
-class base {
+export default class base {
     constructor() {
         this.esClient = client;
     }
 
-
+	/**
+	 * 
+	 * @param {*} id 
+	 */
     async isIdExist(id) {
         var isExist = await client.exists({
             index: this.indexName,
@@ -21,7 +24,10 @@ class base {
         })
         return isExist
     }
-
+	/**
+	 * 
+	 * @param {*} luceneStr 
+	 */
     async isExist(luceneStr) {
         const arr = this.search({
             luceneStr,
@@ -29,7 +35,11 @@ class base {
         })
         return !!arr.length
     }
-
+	/**
+	 * 
+	 * @param {*} id 
+	 * @param {*} fields2return 
+	 */
     async getById(id, fields2return = this.baseField) {
         const obj = await client.get({
             index: this.indexName,
@@ -37,7 +47,19 @@ class base {
             _source: fields2return
         })
         return obj
-    }
+	}
+	/**
+	 * 
+	 * @param {*} id 
+	 */
+	async delById(id){
+		return  await client.delete({
+			index: this.indexName,
+			type: this.defaultTypeName ,
+			id: id
+		})
+	}
+ 
     /**
      * 创建; 支持批量;
      *  entity =  { _id , _source } ||  { ... }
@@ -90,6 +112,11 @@ class base {
         })
     }
 
+	/**
+	 * 
+	 * @param {*} id 
+	 * @param {*} _source 
+	 */
 	async update( id , _source ){
 		return await client.update({ 
 			body:{doc: _source } , 
@@ -98,7 +125,35 @@ class base {
 			type: this.defaultTypeName,
 		})
 	}
+	/**
+	 *  不用 自己生成 id 
+	 * @param {*} _source 
+	 */
+	async index(_source){
+		return await client.index({
+			body: _source ,  
+			index: this.indexName ,
+			type: this.defaultTypeName,
+		})
+	}
 
+	/**
+	 *  不用 自己生成 id 
+	 * @param {*} _source 
+	 */
+	async create( _id,_source){
+		return await client.index({
+			body: _source ,  
+			id:_id,
+			index: this.indexName ,
+			type: this.defaultTypeName,
+		})
+	}
+
+	/**
+	 * 
+	 * @param {*} luceneStr 
+	 */
     async remove(luceneStr) {
         if (!luceneStr) {
             return
@@ -125,7 +180,8 @@ class base {
     async search({
         page = 1,
         size,
-        luceneStr = '',
+		luceneStr = '',
+		q='',
         fields2return,
         sort
     }) {
@@ -133,8 +189,11 @@ class base {
             index: this.indexName,
             from: (page - 1) * this.pageSize,
             size: size || this.pageSize,
-            q: luceneStr
         }
+
+		if( luceneStr || q ){
+			params.q = luceneStr || q ;
+		}
 
         if (fields2return) {
             // _source: fields2return
@@ -154,156 +213,5 @@ class base {
             total: hits.total && hits.total.value,
             data: hits.hits || []
         }
-    }
-}
-
-/**
-
- _id =  marketCode
- stock = {
-    "marketCode": "sz002455",
-    "market": "sz",
-    "code": "002455",
-    "name": "百川股份",
-    "JYFW": "危险化学品经营(按许可证所列方式和项目经营);--经营的东西, 干什么的.",
-	"SSBK": [ "化工行业", "江苏板块", "锂电池"],
-
-	business:[
-		{   date:"" ,
-			hy: [ { zygc:"行业类别" zysr:"主营收入" , srbl:"收入比例"}  ] ,
-			cp:[ {zygc:"产品类别" ,  zysr:"主营收入" , srbl:"收入比例"} ]
-		}
-	],
-	zyhy: [] // 最近时间 主营行业,
-	zycp: [] // 最近时间 主营产品;,
-
-	watchVal: { height , low } ,//
-
- }
-
- */
-class Stock extends base {
-    constructor() {
-        super()
-        // index ;
-        this.indexName = 'stock'
-        // type ;
-        // this.stockType = "stock_";
-        this.defaultTypeName = 'stock_'
-
-        // 查询是每页条数;
-        this.pageSize = 20
-
-        // stock 基本字段;
-        this.baseField = ['_id', 'market', 'code', 'name', 'marketCode']
-        this.forHisField = ['_id', 'market', 'code', 'latestHis']
-
-        // luceneStr 查询 短语;
-        this.lucene_gp = 'code:/[0,3,6]{1}.{5}/'
-
-        // this.lucene_gp = "code:/[0,3,6]{1}.{5}/"
-
-        this.FIELDS = {
-            latestHis: 'latestHis',
-            SSBK: 'SSBK',
-            zycp: 'zycp',
-            zyhy: 'zyhy'
-        }
-    }
-
-    // 生成id;
-    _genId(entity) {
-        return entity.market + entity.code
-    }
-
-    // 从es中获取所有 stock ;
-    getIteratorArr({
-        esFields = [],
-        lucene
-    }) {
-        const params = {
-            page: 1,
-            size: 4000,
-            luceneStr: lucene || this.lucene_gp,
-            fields2return: [...this.baseField, ...esFields]
-        }
-        return this.search(params)
-    }
-
-    /**
-     * esFields 需要查询stock 的字段;
-     * @param funcArray
-     * @param dealData
-     * @param esFields
-     * @returns {Promise<void>}
-     */
-    async Iterator({
-        dealEsEntity,
-        esFields,
-        t = 5,
-        barText = 'stock-Iterator',
-        lucene
-    }) {
-        var allStork = await this.getIteratorArr({
-            esFields,
-            lucene
-        })
-        var length = allStork.data.length
-
-        var bar = new ProgressBar(`   ${barText} [:bar]  :index/${length}  :percent  :elapseds`, {
-            complete: '#',
-            incomplete: '-',
-            width: 60,
-            total: length
-        })
-
-        for (var i = 0; i < length; ++i) {
-            const stock = allStork.data[i]
-            if (t) {
-                await sleep(t)
-            }
-            await runWithReTry(dealEsEntity, [stock])
-
-            await bar.tick({
-                index: i + 1
-            })
-        }
-    }
-}
-
-
-class His extends base {
-    constructor() {
-        super()
-        // index ;
-        this.indexName = 'his'
-        // type ;
-        // this.stockType = "stock_";
-        this.defaultTypeName = 'his_'
-
-        // 查询是每页条数;
-        this.pageSize = 200
-
-	}
-	 
-
-
-}
-
-
-
-var $es = {
-    stock: new Stock(),
-    his: new His(),
-}
-
-export default {
-    install: function(Vue, opts) {
-        // 3. 注入组件选项
-        Vue.mixin({
-            created: function() {
-                this.$es = $es;
-            }
-        })
     }
 }

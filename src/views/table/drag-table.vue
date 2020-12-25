@@ -52,12 +52,14 @@
         </template>
       </el-table-column>
     </el-table>
+
     <div class="show-d">
       <el-tag>The default order :</el-tag> {{ oldList }}
     </div>
     <div class="show-d">
       <el-tag>The after dragging order :</el-tag> {{ newList }}
-    </div>
+    
+	</div>
   </div>
 </template>
 
