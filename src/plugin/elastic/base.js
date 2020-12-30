@@ -184,7 +184,7 @@ export default class base {
 		q='',
         fields2return,
         sort
-    }) {
+    }={}) {
         var params = {
             index: this.indexName,
             from: (page - 1) * this.pageSize,

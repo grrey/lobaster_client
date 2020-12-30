@@ -28,10 +28,21 @@
 							/>
 						</template>
 						<span v-else>{{ row._source.name }}</span>
-					</template>
-
+					</template> 
 				</el-table-column>
- 
+				
+  				<el-table-column align="center" label="Desc" width="180"> 
+					<template slot-scope="{ row }">
+						<template v-if="row.edit">
+							<el-input
+								v-model="row._source.desc"
+								class="edit-input"
+								size="small"
+							/>
+						</template>
+						<span v-else>{{ row._source.desc }}</span>
+					</template> 
+				</el-table-column> 
 
 				<el-table-column min-width="300px" label="Value">
 					<template slot-scope="{ row }">
@@ -89,12 +100,12 @@
 				label-width="150px"
 				style="padding: 0 50px"
 			>
-				<el-form-item label="Desc" prop="desc">
-					<el-input v-model="tempStquery.desc" placeholder="desc" />
+				<el-form-item label="Name" prop="name">
+					<el-input v-model="tempStquery.name" placeholder="name" />
 				</el-form-item>
 
 				<el-form-item label="Value" prop="value">
-					<el-input v-model="tempStquery.value" placeholder="desc" />
+					<el-input v-model="tempStquery.value" placeholder="value" />
 				</el-form-item>
 			</el-form>
 
@@ -108,7 +119,7 @@
 			</div>
 		</el-dialog>
 
-		<!-- query base list  ----------------------------------------------------------------------------->
+		<!--   sttag list  ----------------------------------------------------------------------------->
 
 		<div style="margin: 0 0 5px 20px">
 			<el-button type="primary" @click="openCreateSttagPannel()">
@@ -127,17 +138,32 @@
 			>
 				<el-table-column type="index" width="50"> </el-table-column>
 
-				<el-table-column align="center" label="name" width="80">
+				<el-table-column align="center" label="name" width="180"> 
 					<template slot-scope="{ row }">
-						<span>{{ row._source.name }}</span>
+						<template v-if="row.edit">
+							<el-input
+								v-model="row._source.name"
+								class="edit-input"
+								size="small"
+							/>
+						</template>
+						<span v-else>{{ row._source.name }}</span>
 					</template>
+
 				</el-table-column>
 
-				<el-table-column align="center" label="desc" width="80">
+			 <el-table-column align="center" label="Desc" width="180"> 
 					<template slot-scope="{ row }">
-						<span>{{ row._source.desc }}</span>
-					</template>
-				</el-table-column>
+						<template v-if="row.edit">
+							<el-input
+								v-model="row._source.desc"
+								class="edit-input"
+								size="small"
+							/>
+						</template>
+						<span v-else>{{ row._source.desc }}</span>
+					</template> 
+				</el-table-column> 
 
 				<el-table-column min-width="300px" label="Value">
 					<template slot-scope="{ row }">
@@ -183,7 +209,7 @@
 			</el-table>
 		</div>
 
-		<!-- query tag  add ----------------------->
+		<!--  tag  add ----------------------->
 		<el-dialog
 			:title="'StTag add'"
 			:visible.sync="isCreateSttagPannelOpen"
@@ -195,8 +221,8 @@
 				label-width="150px"
 				style="padding: 0 50px"
 			>
-				<el-form-item label="Desc" prop="desc">
-					<el-input v-model="tempSttag.desc" placeholder="desc" />
+				<el-form-item label="Name" prop="name">
+					<el-input v-model="tempSttag.name" placeholder="name" />
 				</el-form-item>
 
 				<el-form-item label="Value" prop="value">

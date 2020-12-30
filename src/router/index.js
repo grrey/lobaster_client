@@ -92,9 +92,9 @@ export const constantRoutes = [{
         children: [{
             path: 'index',
             component: () => import('@/views/a_stock/stock-view'),
-            name: 'ComplexTable',
+            name: 'StockView',
             meta: {
-                title: 'Complex Table',
+                title: 'S-View',
                 icon: 'table'
             }
         }]

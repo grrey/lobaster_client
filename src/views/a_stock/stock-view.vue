@@ -3,42 +3,44 @@
 		<div class="filter-container">
 			<el-input
 				v-model="listQuery.title"
-				placeholder="Title"
-				style="width: 150px"
+				placeholder="name-biss-code-pinin-jyfw"
+				style="width: 250px"
 				class="filter-item"
 				@keyup.enter.native="handleFilter"
 			/>
 
 			<el-select
-				v-model="listQuery.importance"
-				placeholder="tag"
+				v-model="listQuery.stqueryArr"
+				placeholder="Query"
 				multiple
 				clearable
-				style="width: 250px"
+				style="width: 300px"
 				class="filter-item"
 			>
 				<el-option
-					v-for="item in importanceOptions"
-					:key="item"
-					:label="item"
-					:value="item"
+					v-for="item in stquery"
+					:key="item.value"
+					:label="item.name"
+					:value="item.value"
 				/>
 			</el-select>
 
 			<el-select
-				v-model="listQuery.type"
-				placeholder="Type"
+				v-model="listQuery.sttag"
+				placeholder="sttag"
 				clearable
+				multiple
 				class="filter-item"
-				style="width: 130px"
+				style="width: 300px"
 			>
 				<el-option
-					v-for="item in calendarTypeOptions"
-					:key="item.key"
-					:label="item.display_name + '(' + item.key + ')'"
-					:value="item.key"
+					v-for="item in sttag"
+					:key="item.value"
+					:label="item.name"
+					:value="item.value"
 				/>
 			</el-select>
+
 			<el-select
 				v-model="listQuery.sort"
 				style="width: 140px"
@@ -74,17 +76,23 @@
 	      </el-checkbox>
 	  -->
 		</div>
-
-		<el-table
+ 
+			listQuery = {{ listQuery }}
+  
+		<el-table 
 			:key="tableKey"
 			v-loading="listLoading"
 			:data="list"
 			border
 			fit
 			highlight-current-row
-			style="width: 100%"
-			@sort-change="sortChange"
+			style="width: 100%" 
 		>
+			<el-table-column
+		      type="index"
+		      width="50">
+		    </el-table-column>
+
 			<el-table-column type="expand">
 				<template slot-scope="{ row }">
 					<el-form
@@ -126,19 +134,19 @@
 				:class-name="getSortClass('id')"
 			>
 				<template slot-scope="{ row }">
-					<span>{{ row._id_ }}</span>
+					<span>{{ stockFieldHolder ||  row._id}}</span>
 				</template>
 			</el-table-column>
 
-			<el-table-column label="Author" width="110px" align="center">
+			<el-table-column label="Name" width="110px" align="center">
 				<template slot-scope="{ row }">
-					<span>{{ row._source.name_ }}</span>
+					<span>{{ row._source.name }}</span>
 				</template>
 			</el-table-column>
 
-			<el-table-column label="Author" min-width="150px">
+			<el-table-column label="JYFW" min-width="150px">
 				<template slot-scope="{ row }">
-					<span>{{ row._source.JYFW_ }}</span>
+					<span>{{ stockFieldHolder || row._source.JYFW }}</span>
 				</template>
 			</el-table-column>
 
@@ -153,7 +161,7 @@
 			<el-table-column label="Bussness" width="180">
 				<template slot-scope="{ row }">
 					<el-popover trigger="hover" placement="top" width="300">
-						<p>{{ row._source.JYFW }}</p>
+						<p>{{ stockFieldHolder || row._source.JYFW }}</p>
 						<div slot="reference" class="name-wrapper">
 							<el-tag size="mini">{{ "bussness" }}</el-tag>
 						</div>
@@ -161,15 +169,21 @@
 				</template>
 			</el-table-column>
 
-			<el-table-column label="Title" width="220px">
+			<el-table-column label="HisChart" width="220px">
 				<template slot-scope="{ row, $index }">
-					<!-- <stock-line  :marketCode=" row._source.marketCode " :index="$index"></stock-line> -->
+					  <stock-line   :marketCode=" row._source.marketCode " :index="$index"></stock-line>  
 				</template>
 			</el-table-column>
 
+			<!-- <el-table-column label="HisChart" width="220px">
+				<template slot-scope="{ row, $index }">
+					  <stock-line :marketCode=" row._source.marketCode " :index="$index"></stock-line>  
+				</template>
+			</el-table-column> -->
+
 			<!-- <el-table-column label="Title" min-width="150px">
         <template slot-scope="{row}">
-          <span class="link-type" @click="handleUpdate(row)">{{ row.title }}</span>
+          <span class="link-type" @click="deforeUpdateData(row)">{{ row.title }}</span>
           <el-tag>{{ row._source.JYFW  }}</el-tag>
         </template>
       </el-table-column> -->
@@ -182,7 +196,7 @@
       </el-table-column>
       <el-table-column label="Title" min-width="150px">
         <template slot-scope="{row}">
-          <span class="link-type" @click="handleUpdate(row)">{{ row.title }}</span>
+          <span class="link-type" @click="deforeUpdateData(row)">{{ row.title }}</span>
           <el-tag>{{ row.type | typeFilter }}</el-tag>
         </template>
       </el-table-column>
@@ -215,9 +229,9 @@
         </template>
       </el-table-column> -->
 
-			<el-table-column label="Readings" align="center" width="95">
+			<el-table-column label="Action" align="center" width="95">
 				<template slot-scope="{ row }">
-					<span class="link-type" @click="handleUpdate(row)"
+					<span class="link-type" @click="deforeUpdateData(row)"
 						>Edit</span
 					>
 				</template>
@@ -234,7 +248,7 @@
 					<el-button
 						type="primary"
 						size="mini"
-						@click="handleUpdate(row)"
+						@click="deforeUpdateData(row)"
 					>
 						Edit
 					</el-button>
@@ -367,9 +381,7 @@
 				</el-button>
 				<el-button
 					type="primary"
-					@click="
-						dialogStatus === 'create' ? createData() : updateData()
-					"
+					@click=" updateData()"
 				>
 					Confirm
 				</el-button>
@@ -424,8 +436,16 @@ const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
 	return acc;
 }, {});
 
+
+// 显示 stock 字段;
+const  stockFieldHolder =  true  ;
+
+const  getSource = (params) => {
+	return params._source
+}
+
 export default {
-	name: "ComplexTable",
+	name: "StockView",
 	components: { Pagination, StockLine },
 	directives: { waves },
 	filters: {
@@ -442,19 +462,26 @@ export default {
 		},
 	},
 	data() {
-		return {
+		return { 
+			stockFieldHolder,
+			stquery:[] ,
+			sttag:[],
+			listQuery: {
+				page: 1,
+				stqueryArr:[],
+				title:"",
+				
+				// importance: undefined,
+				// title: undefined,
+				// type: undefined,
+				// sort: "+id",
+			},
+
+
 			tableKey: 0,
 			list: null,
 			total: 0,
 			listLoading: true,
-			listQuery: {
-				page: 1,
-				limit: 20,
-				importance: undefined,
-				title: undefined,
-				type: undefined,
-				sort: "+id",
-			},
 			importanceOptions: [1, 2, 3],
 			calendarTypeOptions,
 			sortOptions: [
@@ -489,7 +516,7 @@ export default {
 		};
 	},
 	created() {
-		this.getList();
+		this.initData();
 	},
 	methods: {
 		// 获取列表;
@@ -504,9 +531,23 @@ export default {
 			//       this.listLoading = false
 			//     }, 1.5 * 1000)
 			//   })
+			let params = [] ;
+			let { title , stqueryArr } = this.listQuery;
+			// title ;
+			if( title ){
+				// params.push(`( name:*${title}* OR code: *${title}* OR JYFW: ${title} OR pinyin: ${title}* OR SSBK: ${title} )`)
+				params.push(`( name:*${title}* )`)
+			}
+			// stquery
+			stqueryArr.forEach((query) => {
+				params.push( query )
+			})
+
+
+			let luceneStr = params.join(' AND ')
 
 			let response = await $es.stock.search({
-				luceneStr: `name:中`,
+				luceneStr: luceneStr ,
 				page: 1,
 			});
 			console.log("search list = ", response);
@@ -514,69 +555,25 @@ export default {
 			this.total = response.total;
 			this.listLoading = false;
 		},
+		// 获取过滤参数;
+		async initData(){
+
+			this.getList();
+			let  stquery = await $es.stquery.search();
+			let  sttag = await $es.sttag.search();
+
+			this.stquery = stquery.data.map(getSource) ;
+			this.sttag = sttag.data.map(getSource) ;
+
+		},
+ 
 		handleFilter() {
 			this.listQuery.page = 1;
 			this.getList();
 		},
-		handleModifyStatus(row, status) {
-			this.$message({
-				message: "操作Success",
-				type: "success",
-			});
-			row.status = status;
-		},
-		sortChange(data) {
-			const { prop, order } = data;
-			if (prop === "id") {
-				this.sortByID(order);
-			}
-		},
-		sortByID(order) {
-			if (order === "ascending") {
-				this.listQuery.sort = "+id";
-			} else {
-				this.listQuery.sort = "-id";
-			}
-			this.handleFilter();
-		},
-		resetTemp() {
-			this.temp = {
-				id: undefined,
-				importance: 1,
-				remark: "",
-				timestamp: new Date(),
-				title: "",
-				status: "published",
-				type: "",
-			};
-		},
-		// handleCreate() {
-		// 	this.resetTemp();
-		// 	this.dialogStatus = "create";
-		// 	this.dialogFormVisible = true;
-		// 	this.$nextTick(() => {
-		// 		this.$refs["dataForm"].clearValidate();
-		// 	});
-		// },
-		createData() {
-			this.$refs["dataForm"].validate((valid) => {
-				if (valid) {
-					this.temp.id = parseInt(Math.random() * 100) + 1024; // mock a id
-					this.temp.author = "vue-element-admin";
-					createArticle(this.temp).then(() => {
-						this.list.unshift(this.temp);
-						this.dialogFormVisible = false;
-						this.$notify({
-							title: "Success",
-							message: "Created Successfully",
-							type: "success",
-							duration: 2000,
-						});
-					});
-				}
-			});
-		},
-		handleUpdate(row) {
+ 
+
+		deforeUpdateData(row) {
 			let _source = row._source;
 			this.temp = {
 				_id: row._id,
@@ -613,49 +610,7 @@ export default {
 			});
 		},
 
-		handleFetchPv(pv) {
-			fetchPv(pv).then((response) => {
-				this.pvData = response.data.pvData;
-				this.dialogPvVisible = true;
-			});
-		},
-		handleDownload() {
-			this.downloadLoading = true;
-			import("@/vendor/Export2Excel").then((excel) => {
-				const tHeader = [
-					"timestamp",
-					"title",
-					"type",
-					"importance",
-					"status",
-				];
-				const filterVal = [
-					"timestamp",
-					"title",
-					"type",
-					"importance",
-					"status",
-				];
-				const data = this.formatJson(filterVal);
-				excel.export_json_to_excel({
-					header: tHeader,
-					data,
-					filename: "table-list",
-				});
-				this.downloadLoading = false;
-			});
-		},
-		formatJson(filterVal) {
-			return this.list.map((v) =>
-				filterVal.map((j) => {
-					if (j === "timestamp") {
-						return parseTime(v[j]);
-					} else {
-						return v[j];
-					}
-				})
-			);
-		},
+
 		getSortClass: function (key) {
 			const sort = this.listQuery.sort;
 			return sort === `+${key}` ? "ascending" : "descending";
