@@ -26,7 +26,7 @@
 			</el-select>
 
 			<el-select
-				v-model="listQuery.sttag"
+				v-model="listQuery.sttagArr"
 				placeholder="sttag"
 				clearable
 				multiple
@@ -421,7 +421,7 @@ import waves from "@/directive/waves"; // waves directive
 import { parseTime } from "@/utils";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
 
-import StockLine from "@/components/Charts/StockLine";
+import StockLine from "./stock-line";
 
 const calendarTypeOptions = [
 	{ key: "CN", display_name: "China" },
@@ -469,6 +469,7 @@ export default {
 			listQuery: {
 				page: 1,
 				stqueryArr:[],
+				sttagArr:[],
 				title:"",
 				
 				// importance: undefined,
@@ -531,17 +532,22 @@ export default {
 			//       this.listLoading = false
 			//     }, 1.5 * 1000)
 			//   })
-			let params = [] ;
-			let { title , stqueryArr } = this.listQuery;
+			let params = [  ] ;
+			let { title , stqueryArr , sttagArr } = this.listQuery;
 			// title ;
 			if( title ){
-				// params.push(`( name:*${title}* OR code: *${title}* OR JYFW: ${title} OR pinyin: ${title}* OR SSBK: ${title} )`)
-				params.push(`( name:*${title}* )`)
+				params.push(`( name:*${title}* OR code: *${title}* OR JYFW: ${title} OR pinyin: ${title}* OR SSBK: ${title} )`)
+				// params.push(`( name:*${title}* )`)
 			}
 			// stquery
 			stqueryArr.forEach((query) => {
 				params.push( query )
 			})
+
+			// sttag 
+			if( sttagArr.length ){
+				params.push( `tag:${ sttagArr.join(',') }`)
+			}
 
 
 			let luceneStr = params.join(' AND ')

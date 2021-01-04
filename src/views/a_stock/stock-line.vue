@@ -58,13 +58,19 @@ export default {
 		this.chart.dispose();
 		this.chart = null;
 	},
+	watch:{
+		marketCode: function(code ){
+			this.initChart();
+		}
+	},
 	methods: {
 		async initChart() {
 			let data = await  $es.his.search({ 
 				luceneStr:`marketCode:${ this.marketCode} AND k:*`,
-				sort:`date:-`
+				sort:`date:desc`,
+				size:150
 			}) 
-			let opt = getLineOpt( data.data );
+			let opt = getLineOpt( data.data.reverse() );
 			if( !opt.lineArr || !opt.lineArr.length ){
 				return ;
 			} 
@@ -127,11 +133,39 @@ export default {
 								{type:'max', label: { position:"start" } }, 
 			                ]
 			            },
+					},
+					{
+						data:opt.bollU ,
+						type:'line',
+						smoth:true ,
+						lineStyle: { 
+			                width: 1
+						},
+					},
+					{
+						data:opt.bollM ,
+						type:'line',
+						smoth:true ,
+						lineStyle: { 
+			                width: 1
+						},
+					},
+					{
+						data:opt.bollD ,
+						type:'line',
+						smoth:true ,
+						lineStyle: { 
+			                width: 1
+						},
 					}
+
+
+
 				]
 			});
 		},
 	},
+ 
 }
 
 
@@ -139,27 +173,45 @@ export default {
 function  getLineOpt(esArr){
 	let dateArr = [] ,
 		lineArr = [],
-		closeArr = [];
+		closeArr = [],
+
+		bollU = [] ,
+		bollM = [] ,
+		bollD = [] ;
+
 	let maxVal = 0 , minVal = 0 ;
 
 	esArr.forEach((o)=>{
-		let { k , date} = o._source ;
+		let { k , date , boll } = o._source ;
 		//[open, close, lowest, highest] （即：[开盘值, 收盘值, 最低值, 最高值]）
 		lineArr.push( [ k.open ,  k.close , k.low , k.high ] );
 		closeArr.push( k.close );
 		dateArr.push( date );
+ 
 		maxVal = maxVal || k.close ;
 		minVal =  minVal || k.close ;
 		maxVal = Math.max( maxVal , k.close );
 		minVal = Math.min( minVal , k.close );
+
+		if( boll ){
+			let { m , u , d  } =  boll;
+			bollU.push(u);
+			bollM.push(m)
+			bollD.push(d)
+		}
 
 	})
 	return {
 		dateArr ,
 		lineArr ,
 		closeArr ,
+
 		maxVal ,
-		minVal
+		minVal ,
+
+		bollU ,
+		bollM ,
+		bollD
 	}
 }
  

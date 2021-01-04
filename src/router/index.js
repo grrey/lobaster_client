@@ -91,7 +91,7 @@ export const constantRoutes = [{
         redirect: '/ComplexTable/index',
         children: [{
             path: 'index',
-            component: () => import('@/views/a_stock/stock-view'),
+            component: () => import('@/views/a_stock/StockView'),
             name: 'StockView',
             meta: {
                 title: 'S-View',
@@ -112,7 +112,7 @@ export const constantRoutes = [{
         },
         children: [{
                 path: 'CommonQuery',
-                component: () => import('@/views/a_stock/common-query'),
+                component: () => import('@/views/a_stock/CommonQuery'),
                 name: 'CommonQuery',
                 meta: {
                     title: 'CommonQuery'
