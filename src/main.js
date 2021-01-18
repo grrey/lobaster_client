@@ -15,6 +15,9 @@ import store from './store'
 import router from './router'
 
 import $es from '@/plugin/elastic/index' // elasticSearch
+import _ from 'lodash';
+import moment from 'moment';
+ 
 
 import './icons' // icon
 import './permission' // permission control
@@ -42,6 +45,8 @@ window.sleep = function (t) {
 } 
 
 window.$es = $es ;
+window._ = _ ;
+window.moment = moment ;
 
 
 Vue.use(Element, {

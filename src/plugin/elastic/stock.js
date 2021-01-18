@@ -21,7 +21,7 @@ export default  class Stock extends base {
         this.pageSize = 20
 
         // stock 基本字段;
-        this.baseField = ['_id', 'market', 'code', 'name', 'marketCode']
+        this.baseField = ['_id', 'market', 'code', 'name', 'marketCode','latestHis']
         this.forHisField = ['_id', 'market', 'code', 'latestHis']
 
         // luceneStr 查询 短语;

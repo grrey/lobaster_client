@@ -75,7 +75,7 @@ export const constantRoutes = [{
         redirect: '/dashboard',
         children: [{
             path: 'dashboard',
-            component: () => import('@/views/dashboard/index'),
+            component: () => import('@/views/a_stock/dashboard/index'),
             name: 'Dashboard',
             meta: {
                 title: 'Dashboard',
@@ -83,7 +83,24 @@ export const constantRoutes = [{
                 affix: true
             }
         }]
-    },
+	},
+	 // stock 表格;
+	 {
+        path: '/Ana',
+        component: Layout,
+        redirect: '/ana',
+        children: [{
+            path: 'ana',
+            component: () => import('@/views/a_stock/ana'),
+            name: 'ana',
+            meta: {
+                title: 'ana',
+                icon: 'table'
+            }
+        }]
+
+	},
+	
     // stock 表格;
     {
         path: '/ComplexTable',
@@ -142,6 +159,21 @@ export const constantRoutes = [{
         ]
     },
 
+    // {
+    //     path: '/dddd',
+    //     component: Layout,
+    //     redirect: '/dashboard',
+    //     children: [{
+    //         path: 'dashboard',
+    //         component: () => import('@/views/dashboard/index'),
+    //         name: 'Dashboard',
+    //         meta: {
+    //             title: 'Dashboard',
+    //             icon: 'dashboard',
+    //             affix: true
+    //         }
+    //     }]
+	// },
 
     {
         path: '/documentation',

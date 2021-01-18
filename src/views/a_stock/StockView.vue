@@ -171,7 +171,7 @@
 
 			<el-table-column label="HisChart" width="220px">
 				<template slot-scope="{ row, $index }">
-					  <stock-line   :marketCode=" row._source.marketCode " :index="$index"></stock-line>  
+					  <!-- <stock-line   :marketCode=" row._source.marketCode " :index="$index"></stock-line>   -->
 				</template>
 			</el-table-column>
 
