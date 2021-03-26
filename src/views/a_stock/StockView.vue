@@ -1,5 +1,12 @@
 <template>
 	<div class="app-container">
+ 
+ <div style="width:300px; heigh:300">
+
+    <iframe src="http://open.iqiyi.com/developer/player_js/coopPlayerIndex.html?vid=4a33fd30be3599a20fa387fa1ec1772c&tvId=9749821000&accessToken=2.ef9c39d6c7f1d5b44768e38e5243157d&appKey=8c634248790d4343bcae1f66129c1010&appId=1368&height=100%&width=100%" frameborder="0" allowfullscreen="true" width="100%" height="100%"></iframe>
+ </div>
+
+
 		<div class="filter-container">
 			<el-input
 				v-model="listQuery.title"
@@ -536,8 +543,8 @@ export default {
 			let { title , stqueryArr , sttagArr } = this.listQuery;
 			// title ;
 			if( title ){
-				params.push(`( name:*${title}* OR code: *${title}* OR JYFW: ${title} OR pinyin: ${title}* OR SSBK: ${title} )`)
-				// params.push(`( name:*${title}* )`)
+				// params.push(`( name:*${title}* OR code: *${title}* OR JYFW: ${title} OR pinyin: ${title}* OR SSBK: ${title} )`)
+				params.push(`( name:*${title}* )`)
 			}
 			// stquery
 			stqueryArr.forEach((query) => {

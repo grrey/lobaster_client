@@ -1,246 +1,190 @@
-<template> 
-	<div>
-
-		<!-- <div 
-			:class="className"
-			:style="{ height: height, width: width }"
-		/> -->
-		<!-- <div :style="{ height: '200px', width: '500px' }"></div> -->
-	</div>
+<template>
+  <div>
+    <div ref="line" :style="{ height: '300px', width: '500px' }"></div>
+  </div>
 </template>
 
 <script>
 import echarts from "echarts";
-import resize from "./mixins/resize";
-import _ from 'lodash'
+import _ from "lodash";
+
+import StockLine from "./stock-line";
 
 let sizeMap = {
-	s:'200' ,
-	m:'400' ,
-	l:'1000'
-}
-
- 
-
+  s: "200",
+  m: "400",
+  l: "1000",
+};
 
 export default {
-	mixins: [resize],
-	props: {
-		className: {
-			type: String,
-			default: "chart",
-		},
-		index: {
-			type: Number,
-			default: 0,
-		},
-		size: {
-			type: String,
-			default: "s", // 1:s , 2:m , 3: l
-		},
-		marketCode: {
-			type: String,
-			default: "sh600235",
-		}
-	},
-	data() {
-		return {
-			chart: null,
-		};
-	},
-	mounted() {
-		this.initChart();
-	},
- 
-	methods: {
-		async initChart() {
-			let data = await  $es.his.search({ 
-				luceneStr:`marketCode:${ this.marketCode} AND k:*`,
-				sort:`date:desc`,
-				size:250
-			}) 
-			let opt = getLineOpt( data.data.reverse() );
-			if( !opt.lineArr || !opt.lineArr.length ){
-				return ;
-			} 
-			this.chart = echarts.init( this.$el ); 
-			console.log( 'his data = ' , this.marketCode , data  , opt );
+  mixins: [],
+  props: {
+    className: {
+      type: String,
+      default: "chart",
+    },
+    index: {
+      type: Number,
+      default: 0,
+    },
+    size: {
+      type: String,
+      default: "s", // 1:s , 2:m , 3: l
+    },
+    marketCode: {
+      type: String,
+      default: "sh600585",
+    },
+  },
+  data() {
+    return {
+      chart: null,
+    };
+  },
+  mounted() {
+    this.initChart();
+  },
 
-			let subtext =   ( ( opt.maxVal - opt.minVal )/opt.minVal *100).toFixed(1) +  "% -- "+ opt.dateArr.length
-			this.chart.setOption({
-				// backgroundColor: "#020202",
-				title: {
-			        // text: '雨量流量关系图',
-			        subtext: subtext ,
-					left: 'center', 
-					subtextStyle:{
-						color:'#000',
-						fontWeight :'bold'
-					}
-			    },
-			  	xAxis: {
-			        type: 'category',
-			        data:  opt.dateArr
-			        // show:false, 
-			    },
-			    yAxis: {
-					type: 'value',
-					scale:true ,
-					splitLine:{ 
-						show:false,
-					}, 
-			        
-			    },
-			    grid:{ 
-			        left:0,
-			        right:0,
-			        bottom:1,
-			        top:0
-				},
-				tooltip:{
-					show:true ,
-					trigger:'axis',
-					position: ['50%', '50%']
-				},
-				series: [
-					// { 
-					// // k 线
-					// type: 'candlestick',
-					// data: opt.lineArr,
-					// } ,
-					{ 
-						data:  opt.closeArr,
-				        type: 'line',
-						smooth: true ,
-						lineStyle: { 
-			                width: 1
-						},
-						// markLine: {
-			            //     symbol: ['none', 'none'], 
-			            //     data: [
-						// 		{type:"min" , label: { position:"start" } },
-						// 		{type:'max', label: { position:"start" } }, 
-			            //     ]
-			            // },
-					},
+  methods: {
+    async initChart() {
+      let data = await $es.his.search({
+        luceneStr: `marketCode:${this.marketCode} AND k:*`,
+        sort: `date:desc`,
+        size: 200,
+      });
 
-					// {
-					// 	data:opt.bollU ,
-					// 	type:'line',
-					// 	smoth:true ,
-					// 	lineStyle: { 
-			        //         width: 1
-					// 	},
-					// },
-					// {
-					// 	data:opt.bollM ,
-					// 	type:'line',
-					// 	smoth:true ,
-					// 	lineStyle: { 
-			        //         width: 1
-					// 	},
-					// },
-					// {
-					// 	data:opt.bollD ,
-					// 	type:'line',
-					// 	smoth:true ,
-					// 	lineStyle: { 
-			        //         width: 1
-					// 	},
-					// }
+      let stData = await  $es.stock.getById( this.marketCode );
 
-					//chg_smooth
-					// {
-					// 	data:opt.chg_smooth ,
-					// 	type:'line',
-					// 	smoth:true ,
-					// 	lineStyle: { 
-			        //         width: 1
-					// 	},
-					// }
+      console.log( 1111 ,stData )
 
-				]
-			});
-		},
-	},
- 
+      let zdSer = [];
+      let  label = [ 'close' ] ;
+      for( let d  in  stData._source.zheDian ){
+          let arr = stData._source.zheDian[d].map((d) => {
+            return [ d.date , d.close ];
+          })
+          label.push( 'd'+d );
+        zdSer.push({
+            name: "d"+ d ,
+            data: arr,
+            type: "line",
+            smooth: false,
+            lineStyle: {
+              width: 1,
+            },
+
+        })
+      } 
+      console.log( 11111 , zdSer )
+
+      let hisArr = data.data.reverse();
+      let opt = getLineOpt(hisArr);
+
+      if (!opt.lineArr || !opt.lineArr.length) {
+        return;
+      }
+
+      this.chart = echarts.init(this.$refs.line); 
+      console.log("his data = ", this.marketCode, data, opt);
+
+
+
+
+      let subtext =
+        (((opt.maxVal - opt.minVal) / opt.minVal) * 100).toFixed(1) +
+        "% -- " +
+        opt.dateArr.length;
+
+      this.chart.setOption({
+        // backgroundColor: "#020202",
+        title: {
+          // text: '雨量流量关系图',
+          // subtext: subtext,
+          left: "center",
+          subtextStyle: {
+            color: "#000",
+            fontWeight: "bold",
+          },
+        },
+        xAxis: {
+          type: "category",
+          data: opt.dateArr,
+          show: false,
+        },
+        yAxis: {
+          type: "value",
+          scale: true, 
+          splitLine: {
+            show: false,
+          },
+        },
+        tooltip: {
+          show: true,
+          trigger: "axis",
+          position: ["50%", "50%"],
+        },
+        legend: {
+            data:  label
+        },
+
+        series: [
+          {
+            name: "close",
+            data: opt.closeArr,
+            type: "line",
+            smooth: false,
+            lineStyle: {
+              width: 1,
+            },
+          },
+          ...zdSer
+          // {
+          //   name: "KKK",
+          //   type: "line",
+          //   data: [
+          //     ["2020-06-11", 6],
+          //     ["2020-09-07", 5],
+          //   ],
+          //   lineStyle: {
+          //     width: 1,
+          //   },
+          // },
+        ],
+      });
+    },
+  },
+};
+
+function getLineOpt(esArr) {
+  let dateArr = [],
+    lineArr = [],
+    closeArr = [],
+    maArr = [];
+
+  let avgArr = [];
+
+  let total_smooth = 0;
+  esArr.forEach((o, i) => {
+    let { k, date, boll, ma = {} } = o._source;
+
+    lineArr.push([k.open, k.close, k.low, k.high]);
+
+    closeArr.push(k.close);
+
+    dateArr.push(date);
+    maArr.push(ma.ma10);
+  });
+
+  return {
+    dateArr,
+    lineArr,
+    closeArr,
+    maArr,
+    avgArr,
+  };
 }
 
-
-
-function  getLineOpt(esArr){
-	let dateArr = [] ,
-		lineArr = [],
-		closeArr = [],
-
-		bollU = [] ,
-		bollM = [] ,
-		bollD = [] ;
-
-	let	m30 =[] ;
-	let chg_smooth = [];
-
-	let maxVal = 0 , minVal = 0 ;
-
-	let total_smooth = 0 ;
-	esArr.forEach((o , i )=>{
-		let { k , date , boll } = o._source ;
-		//[open, close, lowest, highest] （即：[开盘值, 收盘值, 最低值, 最高值]）
-		lineArr.push( [ k.open ,  k.close , k.low , k.high ] );
-		closeArr.push( k.close );
-		dateArr.push( date );
- 
-		maxVal = maxVal || k.close ;
-		minVal =  minVal || k.close ;
-		maxVal = Math.max( maxVal , k.close );
-		minVal = Math.min( minVal , k.close );
-
-		if( boll ){
-			let { m , u , d  } =  boll;
-			bollU.push(u);
-			bollM.push(m)
-			bollD.push(d)
-		}
-		// smooth ;
-		let size = 30 ; 
-		let path = '_source.k.chg';
-
-		total_smooth += _.get( o , path ,  0);
-		chg_smooth.push( total_smooth )
-
-		// if( true || i > size ){
-		// 	let total = 0 ;
-		// 	for(let j = 0 ; j < size ; ++j){ 
-		// 		total += _.get( esArr[ i - j ] ,  path , 0 )
-		// 	}
-		// 	chg_smooth.push(  +( total/size ).toFixed(2) ); 
-		// }else{
-		// 	chg_smooth.push(  _.get(o, path ) ); 
-		// }
-
-
-	})
-
-
-
-
-	return {
-		dateArr ,
-		lineArr ,
-		closeArr ,
-
-		maxVal ,
-		minVal ,
-
-		bollU ,
-		bollM ,
-		bollD , 
-
-		chg_smooth
-	}
-}
- 
-
+// 分析;
 </script>
 
 

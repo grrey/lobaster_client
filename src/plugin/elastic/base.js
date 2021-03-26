@@ -44,7 +44,7 @@ export default class base {
         const obj = await client.get({
             index: this.indexName,
             id: id,
-            _source: fields2return
+            // _source: fields2return
         })
         return obj
 	}
@@ -202,10 +202,10 @@ export default class base {
         if (sort) {
             params.sort = sort
         }
-		if( this.indexName == 'stock'){
-			let subQ = " latesHisDay:> 20201228  AND  macp:>200 "
-			params.q = ( params.q ? (  params.q +" AND " ): "" ) + subQ ; // 有历史的 stock ;
-		}
+    		// if( this.indexName == 'stock'){
+    		// 	let subQ = " latesHisDay:> 20201228  AND  macp:>200 "
+    		// 	params.q = ( params.q ? (  params.q +" AND " ): "" ) + subQ ; // 有历史的 stock ;
+    		// }
         console.log(' search params = ', params);
 
         var {
@@ -218,3 +218,54 @@ export default class base {
         }
     }
 }
+
+
+
+var s = { 
+        "body": {
+            "aggs": {
+                "2": {
+                    "range": {
+                        "field": "macp",
+                        "ranges": [{
+                            "to": 20,
+                            "from": 0
+                        }, {
+                            "to": 30,
+                            "from": 20
+                        }, {
+                            "to": 50,
+                            "from": 30
+                        }, {
+                            "to": 100,
+                            "from": 50
+                        }, {
+                            "to": 200,
+                            "from": 100
+                        }, {
+                            "to": 500,
+                            "from": 200
+                        }, {
+                            "to": 1000,
+                            "from": 500
+                        }, {
+                            "from": 1000
+                        }],
+                        "keyed": true
+                    }
+                }
+            },
+            // "size": 0,
+            // "fields": [{
+            //     "field": "current.date",
+            //     "format": "date_time"
+            // }],
+            // "script_fields": {},
+            // "stored_fields": ["*"],
+            // "_source": {
+            //     "excludes": []
+            // },
+            
+        }, 
+}
+
