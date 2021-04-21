@@ -1,6 +1,11 @@
 <template>
   <div>
-    <div ref="line" :style="{ height: '300px', width: '500px' }"></div>
+    <el-input
+						v-model="marketCode" 
+						placeholder="max"
+					/>
+      <button @click="dra">fffff</button>
+    <div ref="line" :style="{ height: '500px', width: '800px' }"></div>
   </div>
 </template>
 
@@ -31,14 +36,15 @@ export default {
       type: String,
       default: "s", // 1:s , 2:m , 3: l
     },
-    marketCode: {
-      type: String,
-      default: "sh600585",
-    },
+    // marketCode: {
+    //   type: String,
+    //   default: "sh600585",
+    // },
   },
   data() {
     return {
       chart: null,
+      marketCode:"sh603505"
     };
   },
   mounted() {
@@ -46,6 +52,11 @@ export default {
   },
 
   methods: {
+
+dra(){
+  this.initChart();
+},
+
     async initChart() {
       let data = await $es.his.search({
         luceneStr: `marketCode:${this.marketCode} AND k:*`,
@@ -68,6 +79,7 @@ export default {
             name: "d"+ d ,
             data: arr,
             type: "line",
+            show:false ,
             smooth: false,
             lineStyle: {
               width: 1,
@@ -84,7 +96,7 @@ export default {
         return;
       }
 
-      this.chart = echarts.init(this.$refs.line); 
+      this.chart = this.chart ||  echarts.init(this.$refs.line); 
       console.log("his data = ", this.marketCode, data, opt);
 
 
@@ -113,13 +125,13 @@ export default {
         },
         yAxis: {
           type: "value",
-          scale: true, 
+          scale: false, 
           splitLine: {
             show: false,
           },
         },
         tooltip: {
-          show: true,
+          show: false,
           trigger: "axis",
           position: ["50%", "50%"],
         },
