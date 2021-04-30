@@ -1,22 +1,21 @@
 <template>
-	<div class="app-container">
- 
- <div style="width:300px; heigh:300">
-
+  <div class="app-container">
+    <!--  
+ <div style="width:300px; heigh:300"> 
     <iframe src="http://open.iqiyi.com/developer/player_js/coopPlayerIndex.html?vid=4a33fd30be3599a20fa387fa1ec1772c&tvId=9749821000&accessToken=2.ef9c39d6c7f1d5b44768e38e5243157d&appKey=8c634248790d4343bcae1f66129c1010&appId=1368&height=100%&width=100%" frameborder="0" allowfullscreen="true" width="100%" height="100%"></iframe>
- </div>
+ </div> -->
 
+    <el-row class="filter-container" type="flex">
+      <el-col :sm="24">
+        <el-input
+          v-model="listQuery.title"
+          placeholder="name-biss-code-pinin-jyfw"
+          class="filter-item"
+          @keyup.enter.native="handleFilter"
+        />
+      </el-col>
 
-		<div class="filter-container">
-			<el-input
-				v-model="listQuery.title"
-				placeholder="name-biss-code-pinin-jyfw"
-				style="width: 250px"
-				class="filter-item"
-				@keyup.enter.native="handleFilter"
-			/>
-
-			<el-select
+      <!-- <el-select
 				v-model="listQuery.stqueryArr"
 				placeholder="Query"
 				multiple
@@ -30,25 +29,26 @@
 					:label="item.name"
 					:value="item.value"
 				/>
-			</el-select>
+			</el-select> -->
 
-			<el-select
-				v-model="listQuery.sttagArr"
-				placeholder="sttag"
-				clearable
-				multiple
-				class="filter-item"
-				style="width: 300px"
-			>
-				<el-option
-					v-for="item in sttag"
-					:key="item.value"
-					:label="item.name"
-					:value="item.value"
-				/>
-			</el-select>
-
-			<el-select
+      <el-col :sm="24">
+        <el-select
+          v-model="listQuery.sttagArr"
+          placeholder="sttag"
+          clearable
+          multiple
+          class="filter-item"
+          style="width: 100%"
+        >
+          <el-option
+            v-for="(item, i) in sttag"
+            :key="i"
+            :label="item"
+            :value="item"
+          />
+        </el-select>
+      </el-col>
+      <!-- <el-select
 				v-model="listQuery.sort"
 				style="width: 140px"
 				class="filter-item"
@@ -60,18 +60,19 @@
 					:label="item.label"
 					:value="item.key"
 				/>
-			</el-select>
-
-			<el-button
-				v-waves
-				class="filter-item"
-				type="primary"
-				icon="el-icon-search"
-				@click="handleFilter"
-			>
-				Search
-			</el-button>
-			<!--
+			</el-select> -->
+      <el-col>
+        <el-button
+          v-waves
+          class="filter-item"
+          type="primary"
+          icon="el-icon-search"
+          @click="handleFilter"
+        >
+          Search
+        </el-button>
+      </el-col>
+      <!--
 		<el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
 	        Add
 	      </el-button>
@@ -82,281 +83,103 @@
 	        reviewer
 	      </el-checkbox>
 	  -->
-		</div>
- 
-			listQuery = {{ listQuery }}
-  
-		<el-table 
-			:key="tableKey"
-			v-loading="listLoading"
-			:data="list"
-			border
-			fit
-			highlight-current-row
-			style="width: 100%" 
-		>
-			<el-table-column
-		      type="index"
-		      width="50">
-		    </el-table-column>
+    </el-row>
 
-			<el-table-column type="expand">
-				<template slot-scope="{ row }">
-					<el-form
-						label-position="left"
-						inline
-						class="demo-table-expand"
-					>
-						<el-form-item label="商品名称">
-							<span>{{ row.name }}</span>
-						</el-form-item>
-						<el-form-item label="所属店铺">
-							<span>{{ row.shop }}</span>
-						</el-form-item>
-						<el-form-item label="商品 ID">
-							<span>{{ row.id }}</span>
-						</el-form-item>
-						<el-form-item label="店铺 ID">
-							<span>{{ row.shopId }}</span>
-						</el-form-item>
-						<el-form-item label="商品分类">
-							<span>{{ row.category }}</span>
-						</el-form-item>
-						<el-form-item label="店铺地址">
-							<span>{{ row.address }}</span>
-						</el-form-item>
-						<el-form-item label="商品描述">
-							<span>{{ row.desc }}</span>
-						</el-form-item>
-					</el-form>
-				</template>
-			</el-table-column>
+    total: {{ total }}
 
-			<el-table-column
-				label="ID"
-				prop="id"
-				sortable="custom"
-				align="center"
-				width="80"
-				:class-name="getSortClass('id')"
-			>
-				<template slot-scope="{ row }">
-					<span>{{ stockFieldHolder ||  row._id}}</span>
-				</template>
-			</el-table-column>
+    <el-row>
+      <el-col
+        :xs="24"
+        :sm="24"
+        :md="12"
+        :lg="8"
+        :xl="4"
+        v-for="(item, i) in list"
+        :key="item._id"
+        style="margin-bottom: 10px"
+      > 
+          <span>{{ item._id + "-" + item._source.name }}</span>
 
-			<el-table-column label="Name" width="110px" align="center">
-				<template slot-scope="{ row }">
-					<span>{{ row._source.name }}</span>
-				</template>
-			</el-table-column>
+          <div class="chartcard">
+            <stock-line
+              :marketCode="item._source.marketCode"
+              :index="i"
+            ></stock-line>
+          </div> 
+      </el-col>
 
-			<el-table-column label="JYFW" min-width="150px">
-				<template slot-scope="{ row }">
-					<span>{{ stockFieldHolder || row._source.JYFW }}</span>
-				</template>
-			</el-table-column>
+      <el-alert
+        title="更多~"
+        :center="true"
+        :closable="false"
+        type="info"
+        v-in-screen="inScreen"
+      >
+      </el-alert>
+    </el-row>
 
-			<el-table-column label="Tag" width="150px">
-				<template slot-scope="{ row }">
-					<el-tag v-for="(tag, i) in row._source.tag" :key="i">{{
-						tag
-					}}</el-tag>
-				</template>
-			</el-table-column>
-
-			<el-table-column label="Bussness" width="180">
-				<template slot-scope="{ row }">
-					<el-popover trigger="hover" placement="top" width="300">
-						<p>{{ stockFieldHolder || row._source.JYFW }}</p>
-						<div slot="reference" class="name-wrapper">
-							<el-tag size="mini">{{ "bussness" }}</el-tag>
-						</div>
-					</el-popover>
-				</template>
-			</el-table-column>
-
-			<el-table-column label="HisChart" width="220px">
-				<template slot-scope="{ row, $index }">
-					  <!-- <stock-line   :marketCode=" row._source.marketCode " :index="$index"></stock-line>   -->
-				</template>
-			</el-table-column>
-
-			<!-- <el-table-column label="HisChart" width="220px">
-				<template slot-scope="{ row, $index }">
-					  <stock-line :marketCode=" row._source.marketCode " :index="$index"></stock-line>  
-				</template>
-			</el-table-column> -->
-
-			<!-- <el-table-column label="Title" min-width="150px">
-        <template slot-scope="{row}">
-          <span class="link-type" @click="deforeUpdateData(row)">{{ row.title }}</span>
-          <el-tag>{{ row._source.JYFW  }}</el-tag>
-        </template>
-      </el-table-column> -->
-
-			<!--
-	  <el-table-column label="Date" width="150px" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="Title" min-width="150px">
-        <template slot-scope="{row}">
-          <span class="link-type" @click="deforeUpdateData(row)">{{ row.title }}</span>
-          <el-tag>{{ row.type | typeFilter }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="Author" width="110px" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.author }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column v-if="showReviewer" label="Reviewer" width="110px" align="center">
-        <template slot-scope="{row}">
-          <span style="color:red;">{{ row.reviewer }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="Imp" width="80px">
-        <template slot-scope="{row}">
-          <svg-icon v-for="n in + row.importance" :key="n" icon-class="star" class="meta-item__icon" />
-        </template>
-      </el-table-column>
-      <el-table-column label="Readings" align="center" width="95">
-        <template slot-scope="{row}">
-          <span v-if="row.pageviews" class="link-type" @click="handleFetchPv(row.pageviews)">{{ row.pageviews }}</span>
-          <span v-else>0</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="Status" class-name="status-col" width="100">
-        <template slot-scope="{row}">
-          <el-tag :type="row.status | statusFilter">
-            {{ row.status }}
-          </el-tag>
-        </template>
-      </el-table-column> -->
-
-			<el-table-column label="Action" align="center" width="95">
-				<template slot-scope="{ row }">
-					<span class="link-type" @click="deforeUpdateData(row)"
-						>Edit</span
-					>
-				</template>
-			</el-table-column>
-
-			<!--
-			<el-table-column
-				label="Actions"
-				align="center"
-				width="100"
-				class-name="small-padding fixed-width"
-			>
-				<template slot-scope="{ row, }">
-					<el-button
-						type="primary"
-						size="mini"
-						@click="deforeUpdateData(row)"
-					>
-						Edit
-					</el-button>
-
-					 <el-button
-						v-if="row.status != 'published'"
-						size="mini"
-						type="success"
-						@click="handleModifyStatus(row, 'published')"
-					>
-						Publish
-					</el-button>
-					<el-button
-						v-if="row.status != 'draft'"
-						size="mini"
-						@click="handleModifyStatus(row, 'draft')"
-					>
-						Draft
-					</el-button>
-					<el-button
-						v-if="row.status != 'deleted'"
-						size="mini"
-						type="danger"
-						@click="handleDelete(row, $index)"
-					>
-						Delete
-					</el-button> 
-				</template>
-			</el-table-column>
-			-->
-		</el-table>
-
-		<pagination
+    <!-- <pagination
 			v-show="total > 0"
 			:total="total"
 			:page.sync="listQuery.page"
 			:limit.sync="listQuery.limit"
 			@pagination="getList"
-		/>
-		<!-- ================================== update dialog ======================================= -->
-		<el-dialog
-			:title="textMap[dialogStatus]"
-			:visible.sync="dialogFormVisible"
-		>
-			<el-form
-				ref="dataForm"
-				:model="temp"
-				label-position="left"
-				label-width="150px"
-				style="padding: 0 50px"
-			>
-				<el-form-item label="Watch_current" prop="watch_current">
-					<el-input
-						v-model="temp._source.watchVal.curr_high"
-						type="number"
-						placeholder="max"
-					/>
-					<el-input
-						v-model="temp._source.watchVal.curr_low"
-						type="number"
-						placeholder="min"
-					/>
-					<el-checkbox v-model="temp._source.watchVal.curr"
-						>Enable</el-checkbox
-					>
-				</el-form-item>
+		/> -->
+    <!-- ================================== update dialog ======================================= -->
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+      <el-form
+        ref="dataForm"
+        :model="temp"
+        label-position="left"
+        label-width="150px"
+        style="padding: 0 50px"
+      >
+        <el-form-item label="Watch_current" prop="watch_current">
+          <el-input
+            v-model="temp._source.watchVal.curr_high"
+            type="number"
+            placeholder="max"
+          />
+          <el-input
+            v-model="temp._source.watchVal.curr_low"
+            type="number"
+            placeholder="min"
+          />
+          <el-checkbox v-model="temp._source.watchVal.curr">Enable</el-checkbox>
+        </el-form-item>
 
-				<el-form-item label="Watch_his" prop="watch_his">
-					<el-input
-						v-model="temp._source.watchVal.his_high"
-						type="number"
-						placeholder="max"
-					/>
-					<el-input
-						v-model="temp._source.watchVal.his_low"
-						type="number"
-						placeholder="min"
-					/>
-					<el-checkbox v-model="temp._source.watchVal.his"
-						>Enable</el-checkbox
-					>
-				</el-form-item>
+        <el-form-item label="Watch_his" prop="watch_his">
+          <el-input
+            v-model="temp._source.watchVal.his_high"
+            type="number"
+            placeholder="max"
+          />
+          <el-input
+            v-model="temp._source.watchVal.his_low"
+            type="number"
+            placeholder="min"
+          />
+          <el-checkbox v-model="temp._source.watchVal.his">Enable</el-checkbox>
+        </el-form-item>
 
-				<el-form-item label="Tag" prop="tag">
-					<el-select
-						v-model="temp.tag"
-						placeholder="tag"
-						multiple
-						clearable
-						style="width: 100%"
-					>
-						<el-option
-							v-for="item in importanceOptions"
-							:key="item"
-							:label="item"
-							:value="item"
-						/>
-					</el-select>
-				</el-form-item>
+        <el-form-item label="Tag" prop="tag">
+          <el-select
+            v-model="temp.tag"
+            placeholder="tag"
+            multiple
+            clearable
+            style="width: 100%"
+          >
+            <el-option
+              v-for="item in importanceOptions"
+              :key="item"
+              :label="item"
+              :value="item"
+            />
+          </el-select>
+        </el-form-item>
 
-				<!-- 
+        <!-- 
 			<el-form-item label="Type" prop="type">
           <el-select v-model="temp.type" class="filter-item" placeholder="Please select">
             <el-option v-for="item in calendarTypeOptions" :key="item.key" :label="item.display_name" :value="item.key" />
@@ -380,269 +203,247 @@
           <el-input v-model="temp.remark" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
         </el-form-item> 
 		-->
-			</el-form>
+      </el-form>
 
-			<div slot="footer" class="dialog-footer">
-				<el-button @click="dialogFormVisible = false">
-					Cancel
-				</el-button>
-				<el-button
-					type="primary"
-					@click=" updateData()"
-				>
-					Confirm
-				</el-button>
-			</div>
-			
-		</el-dialog>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false"> Cancel </el-button>
+        <el-button type="primary" @click="updateData()"> Confirm </el-button>
+      </div>
+    </el-dialog>
 
-		<!-- ========================================================================= -->
-		<el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
-			<el-table
-				:data="pvData"
-				border
-				fit
-				highlight-current-row
-				style="width: 100%"
-			>
-				<el-table-column prop="key" label="Channel" />
-				<el-table-column prop="pv" label="Pv" />
-			</el-table>
-			<span slot="footer" class="dialog-footer">
-				<el-button type="primary" @click="dialogPvVisible = false"
-					>Confirm</el-button
-				>
-			</span>
-		</el-dialog>
-	</div>
+    <!-- ========================================================================= -->
+    <el-dialog :visible.sync="dialogPvVisible" title="Reading statistics">
+      <el-table
+        :data="pvData"
+        border
+        fit
+        highlight-current-row
+        style="width: 100%"
+      >
+        <el-table-column prop="key" label="Channel" />
+        <el-table-column prop="pv" label="Pv" />
+      </el-table>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogPvVisible = false"
+          >Confirm</el-button
+        >
+      </span>
+    </el-dialog>
+  </div>
 </template>
 
 <script>
 import {
-	fetchList,
-	fetchPv,
-	createArticle,
-	updateArticle,
+  fetchList,
+  fetchPv,
+  createArticle,
+  updateArticle,
 } from "@/api/article";
 import waves from "@/directive/waves"; // waves directive
 import { parseTime } from "@/utils";
 import Pagination from "@/components/Pagination"; // secondary package based on el-pagination
 
+import inScreen from "@/directive/dom/InScreen";
 import StockLine from "./stock-line";
 
 const calendarTypeOptions = [
-	{ key: "CN", display_name: "China" },
-	{ key: "US", display_name: "USA" },
-	{ key: "JP", display_name: "Japan" },
-	{ key: "EU", display_name: "Eurozone" },
+  { key: "CN", display_name: "China" },
+  { key: "US", display_name: "USA" },
+  { key: "JP", display_name: "Japan" },
+  { key: "EU", display_name: "Eurozone" },
 ];
 
 // arr to obj, such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-	acc[cur.key] = cur.display_name;
-	return acc;
+  acc[cur.key] = cur.display_name;
+  return acc;
 }, {});
 
-
 // 显示 stock 字段;
-const  stockFieldHolder =  true  ;
+const stockFieldHolder = !/field=true/.test(location.href);
 
-const  getSource = (params) => {
-	return params._source
-}
+const getSource = (params) => {
+  return params._source;
+};
 
 export default {
-	name: "StockView",
-	components: { Pagination, StockLine },
-	directives: { waves },
-	filters: {
-		statusFilter(status) {
-			const statusMap = {
-				published: "success",
-				draft: "info",
-				deleted: "danger",
-			};
-			return statusMap[status];
-		},
-		typeFilter(type) {
-			return calendarTypeKeyValue[type];
-		},
-	},
-	data() {
-		return { 
-			stockFieldHolder,
-			stquery:[] ,
-			sttag:[],
-			listQuery: {
-				page: 1,
-				stqueryArr:[],
-				sttagArr:[],
-				title:"",
-				
-				// importance: undefined,
-				// title: undefined,
-				// type: undefined,
-				// sort: "+id",
-			},
+  name: "StockView",
+  components: { Pagination, StockLine },
+  directives: { waves, inScreen },
+  filters: {
+    statusFilter(status) {
+      const statusMap = {
+        published: "success",
+        draft: "info",
+        deleted: "danger",
+      };
+      return statusMap[status];
+    },
+    typeFilter(type) {
+      return calendarTypeKeyValue[type];
+    },
+  },
 
+  computed: {
+    inScreen() {
+      return {
+        inHandler: this.moreDomin,
+      };
+    },
+  },
 
-			tableKey: 0,
-			list: null,
-			total: 0,
-			listLoading: true,
-			importanceOptions: [1, 2, 3],
-			calendarTypeOptions,
-			sortOptions: [
-				{ label: "ID Ascending", key: "+id" },
-				{ label: "ID Descending", key: "-id" },
-			],
-			statusOptions: ["published", "draft", "deleted"],
-			showReviewer: false,
-			temp: {
-				_id: undefined,
-				_source: {
-					watchVal: {},
-					tag: [],
-				},
-			},
-			dialogFormVisible: false,
-			dialogStatus: "",
-			textMap: {
-				update: "Edit",
-				create: "Create",
-			},
-			dialogPvVisible: false,
-			pvData: [],
+  data() {
+    return {
+      stockFieldHolder,
+      stquery: [],
+      sttag: [
+        "xiangti",
+        "close_up_3",
+        "close_up_3_a4",
+        "close_up_3_a8",
+        "close_up_3_a10",
+        "close_up_5",
+        "close_up_5_a4",
+        "close_up_5_a8",
+        "close_up_5_a10",
+      ],
 
-			//   rules: {
-			//     type: [{ required: true, message: 'type is required', trigger: 'change' }],
-			//     timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-			//     title: [{ required: true, message: 'title is required', trigger: 'blur' }]
-			//   },
+      page: 0,
+      listQuery: {
+        stqueryArr: [],
+        sttagArr: ['close_up_3_a8'],
+        title: "",
+        // importance: undefined,
+        // title: undefined,
+        // type: undefined,
+        // sort: "+id",
+      },
 
-			downloadLoading: false,
-		};
-	},
-	created() {
-		this.initData();
-	},
-	methods: {
-		// 获取列表;
-		async getList() {
-			this.listLoading = true;
-			//   fetchList(this.listQuery).then(response => {
-			//     this.list = response.data.items
-			//     this.total = response.data.total
+      tableKey: 0,
+      list: [],
+      total: 0,
+      listLoading: true,
+      importanceOptions: [1, 2, 3],
+      calendarTypeOptions,
+      sortOptions: [
+        { label: "ID Ascending", key: "+id" },
+        { label: "ID Descending", key: "-id" },
+      ],
+      statusOptions: ["published", "draft", "deleted"],
+      showReviewer: false,
+      temp: {
+        _id: undefined,
+        _source: {
+          watchVal: {},
+          tag: [],
+        },
+      },
+      dialogFormVisible: false,
+      dialogStatus: "",
+      textMap: {
+        update: "Edit",
+        create: "Create",
+      },
+      dialogPvVisible: false,
+      pvData: [],
 
-			//     // Just to simulate the time of the request
-			//     setTimeout(() => {
-			//       this.listLoading = false
-			//     }, 1.5 * 1000)
-			//   })
-			let params = [  ] ;
-			let { title , stqueryArr , sttagArr } = this.listQuery;
-			// title ;
-			if( title ){
-				// params.push(`( name:*${title}* OR code: *${title}* OR JYFW: ${title} OR pinyin: ${title}* OR SSBK: ${title} )`)
-				params.push(`( name:*${title}* )`)
-			}
-			// stquery
-			stqueryArr.forEach((query) => {
-				params.push( query )
-			})
+      //   rules: {
+      //     type: [{ required: true, message: 'type is required', trigger: 'change' }],
+      //     timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
+      //     title: [{ required: true, message: 'title is required', trigger: 'blur' }]
+      //   },
 
-			// sttag 
-			if( sttagArr.length ){
-				params.push( `tag:${ sttagArr.join(',') }`)
-			}
+      downloadLoading: false,
+    };
+  },
+  created() {},
+  methods: {
+    // 获取列表;
+    async getList(pageNo = 1) {
+      this.listLoading = true;
+      //   fetchList(this.listQuery).then(response => {
+      //     this.list = response.data.items
+      //     this.total = response.data.total
 
+      //     // Just to simulate the time of the request
+      //     setTimeout(() => {
+      //       this.listLoading = false
+      //     }, 1.5 * 1000)
+      //   })
+      let params = [];
+      let { title, stqueryArr, sttagArr } = this.listQuery;
+      // title ;
+      if (title) {
+        params.push(`( name:*${title}* OR code: *${title}* OR JYFW: ${title} OR pinyin: *${title}* OR SSBK: ${title} OR hy:${title} ) `)
+        // params.push(`( name:*${title}* )`);
+      }
+      // stquery
+      stqueryArr.forEach((query) => {
+        params.push(query);
+      });
 
-			let luceneStr = params.join(' AND ')
+      // sttag
+      if (sttagArr.length) {
+        params.push(`tag:${sttagArr.join(",")}`);
+      }
 
-			let response = await $es.stock.search({
-				luceneStr: luceneStr ,
-				page: 1,
-			});
-			console.log("search list = ", response);
-			this.list = response.data;
-			this.total = response.total;
-			this.listLoading = false;
-		},
-		// 获取过滤参数;
-		async initData(){
+      let luceneStr = params.join(" AND ");
 
-			this.getList();
-			let  stquery = await $es.stquery.search();
-			let  sttag = await $es.sttag.search();
+      let response = await $es.stock.search({
+        luceneStr: luceneStr,
+        page: pageNo,
+      });
+      console.log("search list = ", response);
+      this.list = this.list.concat(response.data); //response.data;
+      this.total = response.total;
+      this.listLoading = false;
+    },
 
-			this.stquery = stquery.data.map(getSource) ;
-			this.sttag = sttag.data.map(getSource) ;
+    handleFilter() {
+      this.page = 1;
+      this.list = [];
+      this.getList(this.page);
+    },
 
-		},
- 
-		handleFilter() {
-			this.listQuery.page = 1;
-			this.getList();
-		},
- 
+    updateData() {
+      this.$refs["dataForm"].validate(async (valid) => {
+        if (valid) {
+          const tempData = this.temp;
+          await $es.stock.update(tempData._id, tempData._source);
 
-		deforeUpdateData(row) {
-			let _source = row._source;
-			this.temp = {
-				_id: row._id,
-				_source: {
-					watchVal: _source.watchVal || {},
-					tag: _source.tag,
-				},
-			};
+          const index = this.list.findIndex((v) => v._id === this.temp._id);
+          this.list.splice(index, 1, this.temp);
+          this.dialogFormVisible = false;
+          this.$notify({
+            title: "Success",
+            message: "Update Successfully",
+            type: "success",
+            duration: 2000,
+          });
+        }
+      });
+    },
 
-			this.dialogStatus = "update";
-			this.dialogFormVisible = true;
-			this.$nextTick(() => {
-				this.$refs["dataForm"].clearValidate();
-			});
-		},
-		updateData() {
-			this.$refs["dataForm"].validate(async (valid) => {
-				if (valid) {
-					const tempData = this.temp;
-					await $es.stock.update(tempData._id, tempData._source);
+    getSortClass: function (key) {
+      const sort = this.listQuery.sort;
+      return sort === `+${key}` ? "ascending" : "descending";
+    },
 
-					const index = this.list.findIndex(
-						(v) => v._id === this.temp._id
-					);
-					this.list.splice(index, 1, this.temp);
-					this.dialogFormVisible = false;
-					this.$notify({
-						title: "Success",
-						message: "Update Successfully",
-						type: "success",
-						duration: 2000,
-					});
-				}
-			});
-		},
-
-
-		getSortClass: function (key) {
-			const sort = this.listQuery.sort;
-			return sort === `+${key}` ? "ascending" : "descending";
-		},
-	},
+    moreDomin() {
+      this.page++;
+      this.getList(this.page);
+    },
+  },
 };
 </script>
 
-<style>
-.demo-table-expand {
-	font-size: 0;
+<style scoped >
+.chartcard:before {
+  display: inline-block;
+  content: "";
+  margin-top: 50%;
 }
-.demo-table-expand label {
-	width: 90px;
-	color: #99a9bf;
-}
-.demo-table-expand .el-form-item {
-	margin-right: 0;
-	margin-bottom: 0;
-	width: 50%;
+.chartcard {
+  position: relative;
 }
 </style>

@@ -1,10 +1,11 @@
-const esHost = 'http://localhost:9200'
+// 'http://localhost:9200'
+const esHost =   window.location.hostname ==='localhost' ? 'http://localhost:9200': ( window.location.origin +'/es')
 
 import {
     Client
 } from 'elasticsearch'
 const client = new Client({
-    node: esHost
+    host: esHost
 })
 
 export default class base {
@@ -12,10 +13,10 @@ export default class base {
         this.esClient = client;
     }
 
-	/**
-	 * 
-	 * @param {*} id 
-	 */
+    /**
+     * 
+     * @param {*} id 
+     */
     async isIdExist(id) {
         var isExist = await client.exists({
             index: this.indexName,
@@ -24,10 +25,10 @@ export default class base {
         })
         return isExist
     }
-	/**
-	 * 
-	 * @param {*} luceneStr 
-	 */
+    /**
+     * 
+     * @param {*} luceneStr 
+     */
     async isExist(luceneStr) {
         const arr = this.search({
             luceneStr,
@@ -35,11 +36,11 @@ export default class base {
         })
         return !!arr.length
     }
-	/**
-	 * 
-	 * @param {*} id 
-	 * @param {*} fields2return 
-	 */
+    /**
+     * 
+     * @param {*} id 
+     * @param {*} fields2return 
+     */
     async getById(id, fields2return = this.baseField) {
         const obj = await client.get({
             index: this.indexName,
@@ -47,19 +48,19 @@ export default class base {
             // _source: fields2return
         })
         return obj
-	}
-	/**
-	 * 
-	 * @param {*} id 
-	 */
-	async delById(id){
-		return  await client.delete({
-			index: this.indexName,
-			type: this.defaultTypeName ,
-			id: id
-		})
-	}
- 
+    }
+    /**
+     * 
+     * @param {*} id 
+     */
+    async delById(id) {
+        return await client.delete({
+            index: this.indexName,
+            type: this.defaultTypeName,
+            id: id
+        })
+    }
+
     /**
      * 创建; 支持批量;
      *  entity =  { _id , _source } ||  { ... }
@@ -112,48 +113,50 @@ export default class base {
         })
     }
 
-	/**
-	 * 
-	 * @param {*} id 
-	 * @param {*} _source 
-	 */
-	async update( id , _source ){
-		return await client.update({ 
-			body:{doc: _source } , 
-			id: id,
-			index: this.indexName ,
-			type: this.defaultTypeName,
-		})
-	}
-	/**
-	 *  不用 自己生成 id 
-	 * @param {*} _source 
-	 */
-	async index(_source){
-		return await client.index({
-			body: _source ,  
-			index: this.indexName ,
-			type: this.defaultTypeName,
-		})
-	}
+    /**
+     * 
+     * @param {*} id 
+     * @param {*} _source 
+     */
+    async update(id, _source) {
+        return await client.update({
+            body: {
+                doc: _source
+            },
+            id: id,
+            index: this.indexName,
+            type: this.defaultTypeName,
+        })
+    }
+    /**
+     *  不用 自己生成 id 
+     * @param {*} _source 
+     */
+    async index(_source) {
+        return await client.index({
+            body: _source,
+            index: this.indexName,
+            type: this.defaultTypeName,
+        })
+    }
 
-	/**
-	 *  不用 自己生成 id 
-	 * @param {*} _source 
-	 */
-	async create( _id,_source){
-		return await client.index({
-			body: _source ,  
-			id:_id,
-			index: this.indexName ,
-			type: this.defaultTypeName,
-		})
-	}
+    /**
+     *  不用 自己生成 id 
+     * @param {*} _source 
+     */
+    async create(_id, _source) {
+        return await client.index({
+            body: _source,
+            id: _id,
+            index: this.indexName,
+            type: this.defaultTypeName,
+        })
+    }
 
-	/**
-	 * 
-	 * @param {*} luceneStr 
-	 */
+    /**
+     * 
+     * @param {*} luceneStr 
+     */
     async remove(luceneStr) {
         if (!luceneStr) {
             return
@@ -180,20 +183,20 @@ export default class base {
     async search({
         page = 1,
         size,
-		luceneStr = '',
-		q='',
+        luceneStr = '',
+        q = '',
         fields2return,
         sort
-    }={}) {
+    } = {}) {
         var params = {
             index: this.indexName,
             from: (page - 1) * this.pageSize,
             size: size || this.pageSize,
         }
 
-		if( luceneStr || q ){
-			params.q = luceneStr || q ;
-		}
+        if (luceneStr || q) {
+            params.q = luceneStr || q;
+        }
 
         if (fields2return) {
             // _source: fields2return
@@ -202,10 +205,10 @@ export default class base {
         if (sort) {
             params.sort = sort
         }
-    		// if( this.indexName == 'stock'){
-    		// 	let subQ = " latesHisDay:> 20201228  AND  macp:>200 "
-    		// 	params.q = ( params.q ? (  params.q +" AND " ): "" ) + subQ ; // 有历史的 stock ;
-    		// }
+        // if( this.indexName == 'stock'){
+        // 	let subQ = " latesHisDay:> 20201228  AND  macp:>200 "
+        // 	params.q = ( params.q ? (  params.q +" AND " ): "" ) + subQ ; // 有历史的 stock ;
+        // }
         console.log(' search params = ', params);
 
         var {
@@ -221,51 +224,50 @@ export default class base {
 
 
 
-var s = { 
-        "body": {
-            "aggs": {
-                "2": {
-                    "range": {
-                        "field": "macp",
-                        "ranges": [{
-                            "to": 20,
-                            "from": 0
-                        }, {
-                            "to": 30,
-                            "from": 20
-                        }, {
-                            "to": 50,
-                            "from": 30
-                        }, {
-                            "to": 100,
-                            "from": 50
-                        }, {
-                            "to": 200,
-                            "from": 100
-                        }, {
-                            "to": 500,
-                            "from": 200
-                        }, {
-                            "to": 1000,
-                            "from": 500
-                        }, {
-                            "from": 1000
-                        }],
-                        "keyed": true
-                    }
+var s = {
+    "body": {
+        "aggs": {
+            "2": {
+                "range": {
+                    "field": "macp",
+                    "ranges": [{
+                        "to": 20,
+                        "from": 0
+                    }, {
+                        "to": 30,
+                        "from": 20
+                    }, {
+                        "to": 50,
+                        "from": 30
+                    }, {
+                        "to": 100,
+                        "from": 50
+                    }, {
+                        "to": 200,
+                        "from": 100
+                    }, {
+                        "to": 500,
+                        "from": 200
+                    }, {
+                        "to": 1000,
+                        "from": 500
+                    }, {
+                        "from": 1000
+                    }],
+                    "keyed": true
                 }
-            },
-            // "size": 0,
-            // "fields": [{
-            //     "field": "current.date",
-            //     "format": "date_time"
-            // }],
-            // "script_fields": {},
-            // "stored_fields": ["*"],
-            // "_source": {
-            //     "excludes": []
-            // },
-            
-        }, 
-}
+            }
+        },
+        // "size": 0,
+        // "fields": [{
+        //     "field": "current.date",
+        //     "format": "date_time"
+        // }],
+        // "script_fields": {},
+        // "stored_fields": ["*"],
+        // "_source": {
+        //     "excludes": []
+        // },
 
+    },
+}

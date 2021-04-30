@@ -65,8 +65,7 @@ dra(){
       });
 
       let stData = await  $es.stock.getById( this.marketCode );
-
-      console.log( 1111 ,stData )
+ 
 
       let zdSer = [];
       let  label = [ 'close' ] ;
@@ -86,8 +85,7 @@ dra(){
             },
 
         })
-      } 
-      console.log( 11111 , zdSer )
+      }  
 
       let hisArr = data.data.reverse();
       let opt = getLineOpt(hisArr);
