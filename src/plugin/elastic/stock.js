@@ -12,10 +12,9 @@ export default  class Stock extends base {
     constructor() {
         super()
         // index ;
-        this.indexName = 'stock'
-        // type ;
-        // this.stockType = "stock_";
-        this.defaultTypeName = 'stock_'
+        this.indexName = 'st'
+        // type ; 
+        this.defaultTypeName = 'st_'
 
         // 查询是每页条数;
         this.pageSize = 20

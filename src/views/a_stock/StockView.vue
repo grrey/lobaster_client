@@ -296,7 +296,14 @@ export default {
     return {
       stockFieldHolder,
       stquery: [],
-      sttag: [
+      sttag: [ 
+
+        'hy_sr_up',
+        'hy_lr_up',
+        'cp_sr_up',
+        'cp_lr_up',
+
+
         "xiangti",
         "close_up_3",
         "close_up_3_a4",
@@ -311,7 +318,7 @@ export default {
       page: 0,
       listQuery: {
         stqueryArr: [],
-        sttagArr: ['close_up_3_a8'],
+        sttagArr: ['hy_sr_up'],
         title: "",
         // importance: undefined,
         // title: undefined,
