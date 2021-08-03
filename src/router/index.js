@@ -100,6 +100,22 @@ export const constantRoutes = [{
         }]
 
 	},
+    // hy 数据
+	 {
+        path: '/hy',
+        component: Layout,
+        redirect: '/hy',
+        children: [{
+            path: 'hy',
+            component: () => import('@/views/a_stock/hy'),
+            name: 'hy',
+            meta: {
+                title: 'hy',
+                icon: 'table'
+            }
+        }]
+
+	},
 	
     // stock 表格;
     {

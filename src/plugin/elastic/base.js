@@ -3,7 +3,9 @@ const esHost =   window.location.hostname ==='localhost' ? 'http://localhost:920
 
 import {
     Client
-} from 'elasticsearch'
+} from 'elasticsearch';
+
+import bodybuilder from 'bodybuilder';
 const client = new Client({
     host: esHost
 })
@@ -11,6 +13,7 @@ const client = new Client({
 export default class base {
     constructor() {
         this.esClient = client;
+        this.$bodybuilder = bodybuilder;
     }
 
     /**
@@ -220,54 +223,21 @@ export default class base {
             data: hits.hits || []
         }
     }
+
+
+    async  queryBody( body ){
+        let  result = await  client.search({
+            index: this.indexName ,
+            type: this.defaultTypeName ,
+            body 
+        })
+        return result ;
+    }
+
+    async  createFieldIndex( fieldName ){
+        
+    }
 }
 
 
-
-var s = {
-    "body": {
-        "aggs": {
-            "2": {
-                "range": {
-                    "field": "macp",
-                    "ranges": [{
-                        "to": 20,
-                        "from": 0
-                    }, {
-                        "to": 30,
-                        "from": 20
-                    }, {
-                        "to": 50,
-                        "from": 30
-                    }, {
-                        "to": 100,
-                        "from": 50
-                    }, {
-                        "to": 200,
-                        "from": 100
-                    }, {
-                        "to": 500,
-                        "from": 200
-                    }, {
-                        "to": 1000,
-                        "from": 500
-                    }, {
-                        "from": 1000
-                    }],
-                    "keyed": true
-                }
-            }
-        },
-        // "size": 0,
-        // "fields": [{
-        //     "field": "current.date",
-        //     "format": "date_time"
-        // }],
-        // "script_fields": {},
-        // "stored_fields": ["*"],
-        // "_source": {
-        //     "excludes": []
-        // },
-
-    },
-}
+ 
